@@ -7,6 +7,25 @@ use Train\Train;
 use Layers\Layer;
 use Train\TrainNumbers;
 
+const EXPECTATIONS = [
+    [
+        'expected' => 0,
+        'input' => [0, 0]
+    ],
+    [
+        'expected' => 1,
+        'input' => [1, 0]
+    ],
+    [
+        'expected' => 1,
+        'input' => [0, 1]
+    ],
+    [
+        'expected' => 0,
+        'input' => [1, 1]
+    ]
+];
+
 
 Logger::setLevel(LogLevelEnum::DEBUG);
 
@@ -35,26 +54,22 @@ $topology = $train->getTopology();
 
 $network->setup($topology);
 
-$train
-    ->setNetwork($network)
+$train->setNetwork($network)
     ->train();
 
 
-/*
- * Verify phase
- */
-println("######### Test 1 #########");
-$network->feedForward([1, 1]);
 
-$results = json_encode($network->getResults());
-Logger::debug("The results of verifying are: {$results}");
+foreach (EXPECTATIONS as $expectation) {
+    $network->feedForward($expectation['input']);
+    $results = $network->getResults();
 
+    $result = array_pop($results);
 
-println("######### Test 2 #########");
-$network->feedForward([0, 1]);
+    println("Result: {$result}; Expected: {$expectation['expected']};");
 
-$results = json_encode($network->getResults());
-Logger::debug("The results of verifying are: {$results}");
+    $pass = abs($expectation['expected'] - $result) < 0.1 ? "pass" : "fail";
 
-throw new Exception("fuck.");
+    println("Outcome: {$pass}");
+
+}
 

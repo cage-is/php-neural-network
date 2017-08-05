@@ -1,9 +1,8 @@
 <?php
 namespace Train;
 
+use Net;
 use Logging\Logger;
-use Net, Exception, Neuron;
-use Layers\Layer;
 
 class Train
 {
